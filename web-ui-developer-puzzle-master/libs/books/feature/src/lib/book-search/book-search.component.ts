@@ -5,7 +5,8 @@ import {
   clearSearch,
   getAllBooks,
   ReadingListBook,
-  searchBooks
+  searchBooks,
+  getReadingList
 } from '@tmo/books/data-access';
 import { FormBuilder } from '@angular/forms';
 import { Book } from '@tmo/shared/models';
@@ -25,15 +26,41 @@ export class BookSearchComponent implements OnInit {
   constructor(
     private readonly store: Store,
     private readonly fb: FormBuilder
-  ) {}
+  ) { }
 
   get searchTerm(): string {
     return this.searchForm.value.term;
   }
 
   ngOnInit(): void {
-    this.store.select(getAllBooks).subscribe(books => {
-      this.books = books;
+    this.store.select(getReadingList).subscribe(readingList => {
+      this.store.select(getAllBooks).subscribe(books => {
+
+        const readIngObject = {};
+        readingList.forEach(item => {
+          readIngObject[item.bookId] = {
+            finished: item.finished,
+          }
+        })
+
+        if (readIngObject && books.length) {
+          const newBooks = books.map(book => {
+            if (readIngObject[book.id]) {
+              return {
+                ...book,
+                finished: readIngObject[book.id].finished
+              }
+            } else {
+              return book
+            }
+          })
+        //  console.log(newBooks);
+          this.books = newBooks;
+        } else {
+          this.books = books;
+        }
+      })
+
     });
   }
 
