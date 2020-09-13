@@ -24,11 +24,9 @@ describe('When: Use the search feature', () => {
 
     const form = await $('form');
     const input = await $('input[type="search"]');
-    // await input.sendKeys('javascript');
-    input.sendKeys(protractor.Key.ENTER);
+    await input.sendKeys('java');
+    const items = await $$('[data-testing="book-item"]');
+    expect(items.length).toBeGreaterThan(1);
 
-    // browser.actions().sendKeys(protractor.Key.ENTER).perform();
-
-    // TODO: Implement this test!
   });
 });
