@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { getReadingList, removeFromReadingList, addToReadingList, getAllBooks } from '@tmo/books/data-access';
+import { getReadingList, removeFromReadingList, addToReadingList, getAllBooks, updateReadingList } from '@tmo/books/data-access';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { take } from 'rxjs/operators';
 
@@ -33,5 +33,8 @@ export class ReadingListComponent {
     this.tempBook = item.id;
     this.store.dispatch(removeFromReadingList({ item }));
   }
-  
+
+  updateReadingList(item) {
+    this.store.dispatch(updateReadingList({ item }));
+  }
 }

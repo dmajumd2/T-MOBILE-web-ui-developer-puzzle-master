@@ -50,8 +50,35 @@ export class BookSearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.unsubscribeBookSearch = this.store.select(getAllBooks).subscribe(books => {
-      this.books = books;
+    // this.unsubscribeBookSearch = this.store.select(getAllBooks).subscribe(books => {
+    //   this.books = books;
+    this.store.select(getReadingList).subscribe(readingList => {
+      this.store.select(getAllBooks).subscribe(books => {
+
+        const readIngObject = {};
+        readingList.forEach(item => {
+          readIngObject[item.bookId] = {
+            finished: item.finished,
+          }
+        })
+
+        if (readIngObject && books.length) {
+          const newBooks = books.map(book => {
+            if (readIngObject[book.id]) {
+              return {
+                ...book,
+                finished: readIngObject[book.id].finished
+              }
+            } else {
+              return book
+            }
+          })
+          this.books = newBooks;
+        } else {
+          this.books = books;
+        }
+      })
+
     });
 
     this.subscription = this.searchTextChanged.pipe(
