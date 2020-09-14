@@ -89,3 +89,4 @@ export class BookSearchComponent implements OnInit, OnDestroy {
     this.unsubscribeBookSearch.unsubscribe();
     this.subscription.unsubscribe();
 }
+}
