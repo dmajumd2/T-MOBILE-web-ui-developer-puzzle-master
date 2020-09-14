@@ -17,3 +17,10 @@ Accessibility Issue
     Three issues that are not found in the automated scan.
     1) Search button - user does not know where to click for search, only icon is available. It should look like a button and if we hover over it should show tooltip to display the search for book.
     2) Color of the description text was very light so changed it to a dark
+
+
+
+    Note: pending
+    1) For task 4 I was able to mark book as finished, only after it is reflecting after refresh of the page.
+    2) Some test cases are not done but tried to do some as I am new to protractor but can be done from my side if more time is available for this project
+
