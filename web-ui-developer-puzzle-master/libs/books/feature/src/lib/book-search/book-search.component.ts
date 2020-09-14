@@ -1,5 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
+
+
+import { Subject } from "rxjs";
+
+import { Observable } from "rxjs";
+
+import { debounceTime, distinctUntilChanged, mergeMap } from 'rxjs/operators';
+
 import {
   addToReadingList,
   clearSearch,
@@ -19,16 +27,18 @@ import { Subscription } from 'rxjs';
 export class BookSearchComponent implements OnInit, OnDestroy {
   books: ReadingListBook[];
   unsubscribeBookSearch: Subscription;
+  subscription: any;
 
   searchForm = this.fb.group({
     term: ''
   });
 
+  searchTextChanged = new Subject<string>();
+
   constructor(
     private readonly store: Store,
     private readonly fb: FormBuilder
-  ) {}
- 
+  ) { }
 
   get searchTerm(): string {
     return this.searchForm.value.term;
@@ -38,12 +48,24 @@ export class BookSearchComponent implements OnInit, OnDestroy {
     this.unsubscribeBookSearch = this.store.select(getAllBooks).subscribe(books => {
       this.books = books;
     });
+
+    this.subscription = this.searchTextChanged.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe((res) => {
+      this.searchForm.controls.term.setValue(res);
+      this.searchBooks()
+    });
   }
 
   formatDate(date: void | string) {
     return date
       ? new Intl.DateTimeFormat('en-US').format(new Date(date))
       : undefined;
+  }
+
+  search($event: { target: { value: string; }; }) {
+    this.searchTextChanged.next($event.target.value);
   }
 
   addBookToReadingList(book: Book) {
@@ -65,5 +87,5 @@ export class BookSearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.unsubscribeBookSearch.unsubscribe();
-  }
+    this.subscription.unsubscribe();
 }
