@@ -6,18 +6,21 @@ import { Subject } from "rxjs";
 
 import { Observable } from "rxjs";
 
-import { debounceTime, distinctUntilChanged, mergeMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, mergeMap, take } from 'rxjs/operators';
 
 import {
   addToReadingList,
   clearSearch,
   getAllBooks,
   ReadingListBook,
-  searchBooks
+  searchBooks,
+  getReadingList,
+  removeFromReadingList
 } from '@tmo/books/data-access';
 import { FormBuilder } from '@angular/forms';
 import { Book } from '@tmo/shared/models';
 import { Subscription } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'tmo-book-search',
@@ -28,6 +31,7 @@ export class BookSearchComponent implements OnInit, OnDestroy {
   books: ReadingListBook[];
   unsubscribeBookSearch: Subscription;
   subscription: any;
+  tempBook: string;
 
   searchForm = this.fb.group({
     term: ''
@@ -37,7 +41,8 @@ export class BookSearchComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly store: Store,
-    private readonly fb: FormBuilder
+    private readonly fb: FormBuilder,
+    private _snackBar: MatSnackBar
   ) { }
 
   get searchTerm(): string {
@@ -69,6 +74,20 @@ export class BookSearchComponent implements OnInit, OnDestroy {
   }
 
   addBookToReadingList(book: Book) {
+    const addedBook = this._snackBar.open("Added", "Undo Action", {
+      duration: 3000,
+    });
+
+    addedBook.onAction().subscribe(() => {
+      this.store.select(getReadingList).pipe(take(1)).subscribe(books => {
+        const item = books.find(item1 => item1.bookId === this.tempBook);
+        if (item) {
+          this.store.dispatch(removeFromReadingList({ item }));
+        }
+      });
+      addedBook.dismiss();
+    })
+    this.tempBook = book.id;
     this.store.dispatch(addToReadingList({ book }));
   }
 
