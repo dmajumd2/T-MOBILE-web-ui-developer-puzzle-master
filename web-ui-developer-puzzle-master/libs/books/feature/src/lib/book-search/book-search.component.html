@@ -3,10 +3,12 @@
     <input
       autoFocus
       matInput
+      (keyup)="search($event)"
       type="search"
       placeholder="Search for books to add to your reading list"
       formControlName="term"
     />
+
     <button mat-icon-button matSuffix>
       <mat-icon>search</mat-icon>
     </button>
@@ -24,18 +26,20 @@
           <img src="{{ b.coverUrl }}" />
         </div>
         <div class="book--content--info">
-          <div><strong>Author:</strong> {{ b.authors.join(',') }}</div>
-          <div><strong>Publisher:</strong> {{ b.publisher }}</div>
+          <div><strong>Author:</strong><span style="font-weight: 500;">{{ b.authors.join(',') }}</span></div>
+          <div><strong>Publisher:</strong> <span style="font-weight: 500;">{{ b.publisher }}</span></div>
           <div>
-            <strong>Published:</strong> {{ formatDate(b.publishedDate) }}
+            <strong>Published:</strong> <span style="font-weight: 500;">{{ formatDate(b.publishedDate) }}</span>
           </div>
-          <p [innerHTML]="b.description"></p>
+          <p style="font-weight: 500;" [innerHTML]="b.description"></p>
           <div>
             <button
+              id="wantToRead"
               mat-flat-button
               color="primary"
               (click)="addBookToReadingList(b)"
               [disabled]="b.isAdded"
+              aria-label="Click here to Read the book"
             >
               Want to Read
             </button>
@@ -48,9 +52,7 @@
 <ng-template #empty>
   <div class="empty">
     <p>
-      Try searching for a topic, for example "<a (click)="searchExample()"
-        >JavaScript</a
-      >".
+      Try searching for a topic, for example "<a (click)="searchExample()">JavaScript</a>".
     </p>
   </div>
 </ng-template>
